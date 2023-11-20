@@ -1,0 +1,38 @@
+type ReadingMemo {
+  userId: String!
+  janCode: String!
+  title: String
+  author: String
+  content: String
+}
+
+input NewReadingMemo {
+  userId: String!
+  janCode: String!
+  title: String
+  author: String
+  content: String
+}
+
+input UpdateReadingMemo {
+  userId: String!
+  janCode: String!
+  title: String
+  author: String
+  content: String
+}
+
+input DeleteReadingMemo {
+  userId: String!
+  janCode: String!
+}
+
+extend type Query {
+  readingmemos: [ReadingMemo!]!
+}
+
+extend type Mutation {
+  createReadingMemo(input: NewReadingMemo!): ReadingMemo!
+  updateReadingMemo(input: UpdateReadingMemo!): ReadingMemo!
+  deleteReadingMemo(input: DeleteReadingMemo!): Int!
+}

@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  go:
+    build:
+      context: .
+      dockerfile: Dockerfile_Go
+    depends_on:
+      - db
+    environment:
+      MYSQL_DATABASE: test_database
+      MYSQL_USER: test_user
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: root_password
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./ObserBooksBackend:/go/src
+    networks:
+      - golang_test_network
+    ports:
+      - 8080:8080
+  db:
+    build:
+      context: .
+      dockerfile: Dockerfile_MySQL
+    container_name: db
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+    tty: true
+    ports:
+      - 3306:3306
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    env_file:
+      - ./ObserBooksBackend/frameworksDrivers/mysql/mysql.env
+    volumes:
+      - ./ObserBooksBackend/frameworksDrivers/mysql:/etc/mysql/conf.d
+      - type: volume
+        source: mysql-data
+        target: /var/lib/mysql
+      - type: bind
+        source: ./ObserBooksBackend/frameworksDrivers/init
+        target: /docker-entrypoint-initdb.d
+    networks:
+      - golang_test_network
+
+volumes:
+  mysql-data:
+    name: mysql_volume
+
+networks:
+  golang_test_network:
